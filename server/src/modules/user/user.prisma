@@ -1,0 +1,9 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+    user_id    String  @id @default(cuid())
+    first_name Boolean @default(false)
+    email      String  @unique
+}
