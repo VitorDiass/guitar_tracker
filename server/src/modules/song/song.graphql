@@ -1,33 +1,35 @@
 scalar DateTime
 
 type Song {
-    song_id : ID!
-    artist_name : String!
-    song_name : String!
-    prog_melody : Int!
-    prog_rhythm : Int!
-    fromLesson : Boolean!
-    instrument_type : Int
-    links : String!
-    updatedAt : DateTime
-    createdAt : DateTime
+  song_id: ID!
+  artist_name: String!
+  song_name: String!
+  prog_melody: Int!
+  prog_rhythm: Int!
+  fromLesson: Boolean!
+  instrument_type: Int
+  links: String!
+  updatedAt: DateTime
+  createdAt: DateTime
 }
 
 type Query {
-    getSong(song_id : ID!) : Song!
-    getAllSongs: [Song!]!
+  getSong(song_id: ID!): Song!
+  getAllSongs: [Song!]!
 }
 
 type Mutation {
-    createSong(input : SongInput) : Song
+  createSong(input: SongInput!): Song!
+  updateSong(input: SongInput!): Song!
 }
 
 input SongInput {
-    artist_name : String
-    song_name : String
-    prog_melody : Int
-    prog_rhythm : Int
-    fromLesson : Boolean
-    instrument_type : Int
-    links : String
+  song_id: String
+  artist_name: String
+  song_name: String
+  prog_melody: Int
+  prog_rhythm: Int
+  fromLesson: Boolean
+  instrument_type: Int
+  links: String
 }
