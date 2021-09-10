@@ -3,7 +3,8 @@
       {
           "input": [
             "./prisma/base.prisma",
-            "./src/modules/user/user.prisma"
+            "./src/modules/user/user.prisma",
+            "./src/modules/song/song.prisma"
           ],
           "output": "prisma/schema.prisma"
       }

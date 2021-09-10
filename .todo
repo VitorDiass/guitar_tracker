@@ -4,7 +4,8 @@ DEV ENV:
 
 STACK:
     ✔ POSTGRES DOCKER @done(21-09-08 11:16)
-    ☐ APOLLO SERVER
-    ☐ GRAPHQL
-    ☐ PRISMA 
-    ☐ PRISMIX 
+    ✔ APOLLO SERVER @done(21-09-10 11:12)
+    ✔ GRAPHQL @done(21-09-10 11:12)
+    ✔ PRISMA @done(21-09-10 11:12)
+    ✔ PRISMIX @done(21-09-10 11:12)
+    ✔ CODEGEN FOR RESOLVERS @done(21-09-10 11:13)

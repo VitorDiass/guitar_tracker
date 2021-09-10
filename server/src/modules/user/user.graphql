@@ -1,0 +1,13 @@
+type User {
+    user_id: ID!
+    first_name : String!
+    last_name : String!
+    email : String!
+    isLoggedIn : Boolean!
+}
+
+type Query {
+    getAllUsers: [User!]!
+    getUser(id : ID!) : User
+}
+

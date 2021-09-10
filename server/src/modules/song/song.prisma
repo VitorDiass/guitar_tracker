@@ -1,0 +1,12 @@
+model Song {
+    song_id         String   @id @default(cuid())
+    song_name       String   @unique
+    artist_name     String
+    prog_melody     Int?
+    prog_rhythm     Int?
+    instrument_type Int?
+    fromLesson      Boolean?
+    links           String?
+    createdAt       DateTime?
+    updatedAt       DateTime?
+}
