@@ -5,9 +5,10 @@
   "scripts": {
     "prismix:run": "npx prismix && prisma format",
     "migrate": "npx prisma migrate dev",
+    "prismix:run:migrate": "npm run prismix:run && npm run migrate",
     "server": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "db-generate": "npm run prismix:run && npm run migrate",
-    "generate": "graphql-codegen --config codegen.yml"
+    "generate": "graphql-codegen --config codegen.yml",
+    "build" : "tsc"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.2.0",

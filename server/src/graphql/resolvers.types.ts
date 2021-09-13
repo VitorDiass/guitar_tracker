@@ -157,20 +157,31 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createSong?: Maybe<Song>;
+  createSong: Song;
+  deleteSong?: Maybe<Song>;
+  updateSong: Song;
 };
 
 
 export type MutationCreateSongArgs = {
-  artist_name?: Maybe<Scalars['String']>;
-  song_name?: Maybe<Scalars['String']>;
+  input: SongInput;
+};
+
+
+export type MutationDeleteSongArgs = {
+  song_id: Scalars['ID'];
+};
+
+
+export type MutationUpdateSongArgs = {
+  input: SongInput;
 };
 
 export type Query = {
   __typename?: 'Query';
   getAllSongs: Array<Song>;
   getAllUsers: Array<User>;
-  getSong: Song;
+  getSong?: Maybe<Song>;
   getUser?: Maybe<User>;
 };
 
@@ -200,6 +211,12 @@ export type Song = {
 
 export type SongInput = {
   artist_name?: Maybe<Scalars['String']>;
+  fromLesson?: Maybe<Scalars['Boolean']>;
+  instrument_type?: Maybe<Scalars['Int']>;
+  links?: Maybe<Scalars['String']>;
+  prog_melody?: Maybe<Scalars['Int']>;
+  prog_rhythm?: Maybe<Scalars['Int']>;
+  song_id?: Maybe<Scalars['String']>;
   song_name?: Maybe<Scalars['String']>;
 };
 
@@ -519,7 +536,9 @@ export interface MacScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes[
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createSong?: Resolver<Maybe<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<MutationCreateSongArgs, never>>;
+  createSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<MutationCreateSongArgs, 'input'>>;
+  deleteSong?: Resolver<Maybe<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<MutationDeleteSongArgs, 'song_id'>>;
+  updateSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<MutationUpdateSongArgs, 'input'>>;
 }>;
 
 export interface NegativeFloatScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['NegativeFloat'], any> {
@@ -577,7 +596,7 @@ export interface PostalCodeScalarConfig extends GraphQLScalarTypeConfig<Resolver
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   getAllSongs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>;
   getAllUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-  getSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<QueryGetSongArgs, 'song_id'>>;
+  getSong?: Resolver<Maybe<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<QueryGetSongArgs, 'song_id'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
 }>;
 
