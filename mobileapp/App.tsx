@@ -17,7 +17,9 @@ export default function App() {
         <StatusBar/>
         <Text>HELLO</Text>
 
-       {/*   <FooterComponent/> */}
+
+         <FooterComponent/>
+
         
         <Route path="/home" component={Home}></Route>
         <Route path="/about" component={About}></Route>
