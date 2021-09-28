@@ -6,7 +6,6 @@ import tw from "tailwind-react-native-classnames";
 import FooterComponent from "./components/footer";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Tab } from 'react-native-elements';
 import { NavigationContainer } from "@react-navigation/native";
 
 
