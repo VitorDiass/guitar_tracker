@@ -6,9 +6,9 @@ type Song {
   song_name: String!
   prog_melody: Int!
   prog_rhythm: Int!
-  fromLesson: Boolean!
+  fromLesson: Boolean
   instrument_type: Int
-  links: String!
+  links: String
   updatedAt: DateTime
   createdAt: DateTime
 }
