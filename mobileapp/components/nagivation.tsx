@@ -9,24 +9,13 @@ import SongsComponent from './songs';
 import { SearchBar } from 'react-native-elements';
 import { SearchBarBaseProps } from 'react-native-elements/dist/searchbar/SearchBar';
 
-
 const Tab = createBottomTabNavigator();
 
-const SafeSearchBar = (SearchBar as unknown) as React.FC<SearchBarBaseProps>;
-
 const FooterComponent = () => {
-    const [search, setSearch] = useState<string>('');
     const navigation = useNavigation();
 
 
     return (
-      /*   <View style={tw.style('flex-1 flex-row bottom-0 left-0 right-0 absolute h-16 justify-evenly items-center text-center',{})}>
-            <Tab value={index} onChange={setIndex}>
-              <Tab.Item title="recent" />
-              <Tab.Item title="favorite" />
-              <Tab.Item title="cart" />
-            </Tab>
-         </View>  */
       <Tab.Navigator
         backBehavior="history"
         screenOptions={{
