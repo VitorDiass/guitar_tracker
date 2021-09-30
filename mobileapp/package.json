@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.4.15",
+    "@react-native-picker/picker": "^2.1.0",
     "@react-navigation/bottom-tabs": "^6.0.7",
     "@react-navigation/native": "^6.0.4",
     "@react-navigation/native-stack": "^6.2.2",

@@ -9,7 +9,19 @@ export const colors = StyleSheet.create({
         },
         dangerColorBg : {
             color : "#FECCE5"
-        } 
+        },
+        warningColor : {
+            color : "#FEBB39"
+        },
+        warningColorBg : {
+            color : "#FFF4D8"
+        },
+        successColor : {
+            color : "#15DACC"
+        },
+        successColorBg : {
+            color : "#DDFAF8"
+        }
       /*   --lb-background : #F5F6FB;
          --lb-background : #EBEBF6;
          --lb-background-white : #FFFFFF;
