@@ -36,14 +36,14 @@ const NavigationComponent = () => {
     >
       <Tab.Screen
         options={{
-          tabBarIcon: ({ focused, size, color }) => <Icon name="music" size={35} color={color} />,
+          tabBarIcon: ({ focused, size, color }) => <Icon name="music" size={35} color={color} />
         }}
         name="Songs"
         component={SongsComponent}
       />
       <Tab.Screen
         options={{
-          tabBarIcon: ({ focused, size, color }) => <Icon name="user" size={35} color={color} />,
+          tabBarIcon: ({ focused, size, color }) => <Icon name="user" size={35} color={color} />
         }}
         name="Home"
         component={() => <Text>HOME</Text>}

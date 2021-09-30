@@ -1,3 +1,11 @@
 import { Song } from "../graphql/types";
 
-export const SongFieldsFilters = ["id","Song Name","Artist Name","Date Created", "Date Updated", "Melody Prog.","Rhythm Prog."];
+export const SongOrderBy : any = {
+  song_id: "Id",
+  song_name: "Song Name",
+  artist_name: "Artist Name",
+  createdAt: "Date Created",
+  updatedAt: "Date Updated",
+  prog_melody: "Melody Prog.",
+  prog_rhythm: 'Rhythm Prog.'
+};

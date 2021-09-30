@@ -28,7 +28,6 @@ const ProgressBarComponent = (props : LinearProgressProps & ProgressBarInterface
             colorCalc = colors.successColor.color;
             trackColorCalc = colors.successColorBg.color;
         }
-        console.log(colorCalc,trackColorCalc);
         return [colorCalc, trackColorCalc]
     }
 
