@@ -12,8 +12,8 @@ const ProgressBarComponent = (props : LinearProgressProps & ProgressBarInterface
     const dynamicBarColor : boolean = props?.dynamicBarColor || false;
     const variant                   = props.variant || 'determinate';
     const value                     = props.value || 0;
-    let color                       = props.color;
-    let trackColor                  = props.trackColor || '';
+    let color                       = props.color || 'black';
+    let trackColor                  = props.trackColor || 'gray';
 
     const calculateColor = (value : number) => {
         let colorCalc;
@@ -32,7 +32,7 @@ const ProgressBarComponent = (props : LinearProgressProps & ProgressBarInterface
     }
 
     (function(){
-        [color,trackColor] = calculateColor(value);
+        if(dynamicBarColor) [color,trackColor] = calculateColor(value);
     })()
     
  /*    useEffect(() => {

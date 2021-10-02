@@ -199,9 +199,9 @@ export type Song = {
   __typename?: 'Song';
   artist_name: Scalars['String'];
   createdAt?: Maybe<Scalars['DateTime']>;
-  fromLesson: Scalars['Boolean'];
+  fromLesson?: Maybe<Scalars['Boolean']>;
   instrument_type?: Maybe<Scalars['Int']>;
-  links: Scalars['String'];
+  links?: Maybe<Scalars['String']>;
   prog_melody: Scalars['Int'];
   prog_rhythm: Scalars['Int'];
   song_id: Scalars['ID'];
@@ -212,11 +212,8 @@ export type Song = {
 export type SongInput = {
   artist_name?: Maybe<Scalars['String']>;
   fromLesson?: Maybe<Scalars['Boolean']>;
-  instrument_type?: Maybe<Scalars['Int']>;
-  links?: Maybe<Scalars['String']>;
   prog_melody?: Maybe<Scalars['Int']>;
   prog_rhythm?: Maybe<Scalars['Int']>;
-  song_id: Scalars['ID'];
   song_name?: Maybe<Scalars['String']>;
 };
 
@@ -615,9 +612,9 @@ export interface SafeIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTy
 export type SongResolvers<ContextType = any, ParentType extends ResolversParentTypes['Song'] = ResolversParentTypes['Song']> = ResolversObject<{
   artist_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  fromLesson?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  fromLesson?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   instrument_type?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  links?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  links?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   prog_melody?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   prog_rhythm?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   song_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -734,4 +731,11 @@ export type Resolvers<ContextType = any> = ResolversObject<{
 export type GetAllSongsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllSongsQuery = { __typename?: 'Query', getAllSongs: Array<{ __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson: boolean, instrument_type?: Maybe<number>, links: string, updatedAt?: Maybe<any>, createdAt?: Maybe<any> }> };
+export type GetAllSongsQuery = { __typename?: 'Query', getAllSongs: Array<{ __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> }> };
+
+export type CreateSongMutationMutationVariables = Exact<{
+  createSongInput: SongInput;
+}>;
+
+
+export type CreateSongMutationMutation = { __typename?: 'Mutation', createSong: { __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> } };
