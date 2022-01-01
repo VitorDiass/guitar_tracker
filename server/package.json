@@ -8,7 +8,8 @@
     "prismix:run:migrate": "npm run prismix:run && npm run migrate",
     "server": "ts-node-dev --respawn --transpile-only src/server.ts",
     "generate": "graphql-codegen --config codegen.yml",
-    "build": "tsc"
+    "build": "tsc",
+    "prisma:studio" : "npx prisma studio"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.2.0",

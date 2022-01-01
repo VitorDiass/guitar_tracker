@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { View, ScrollView, Linking, TouchableOpacity, Pressable, TouchableHighlight } from "react-native";
+import { View, ScrollView, Linking, TouchableOpacity, Pressable, TouchableHighlight, TextInput, RefreshControl } from "react-native";
 import { GET_ALL_SONGS, SAVE_NEW_SONG } from "../graphql/song.graphql";
-import { GetAllSongsQuery, Song, SongInput } from "../graphql/types";
+import { GetAllSongsQuery, SongInput } from "../graphql/types";
 import { Card, Overlay, Text, BottomSheet, ListItem, Button, Badge, Input, Slider, CheckBox } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
 import { colors } from "../styles/global";
@@ -13,42 +13,60 @@ import SearchBarComponent from "./searchbar";
 import FABComponent from "./fab";
 import ProgressBarComponent from "./progressbar";
 import FilterComponent from "./filter";
-import { SongOrderBy } from "../helpers/song.filter";
+import { SongOrderBy, SongEditFormValue, Song } from "../helpers/song";
 import { Picker } from "@react-native-picker/picker";
 import { Controller, useForm } from "react-hook-form";
+import OptionsBarComponent from "./optionsBar";
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import StyledInput from "./input";
+import Toast from 'react-native-toast-message';
 
 const SongsComponent = () => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [editSong, setEditSong] = useState<Song>();
-  const [orderBySelected, setOrderBySelected] = useState<any>({});
+  const [orderBySelected, setOrderBySelected] = useState<any>({ key: "createdAt", value: "Date Created" });
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [search, setSearch] = useState("");
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
+  const [value, changeValue] = useState('ola');
   const [cardView, setCardView] = useState<boolean>(true);
+
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+
   const { data, loading, error, refetch } = useQuery<GetAllSongsQuery>(GET_ALL_SONGS);
-  const [mutationFunction, ...res] = useMutation(SAVE_NEW_SONG, {
-    onError: (err) => {
-      console.log(console.log(JSON.stringify(err, null, 2)));
-    },
+
+  if(error){
+    console.log(error)
+  }
+  
+
+  const [mutationFunction, ...params] = useMutation(SAVE_NEW_SONG, {
+   onCompleted : (data) => {
+    setShowOverlay(false);
+    Toast.show({
+      type : 'success',
+      text1 : 'New Song',
+      text2 : 'New song created successfully',
+      position : 'bottom',
+      visibilityTime : 3000,
+      bottomOffset : 100
+    })
+   },
+   onError : (error) => {
+     console.log(error)
+   }
+    
   });
 
   const [filteredData, setFilteredData] = useState<any>(data?.getAllSongs);
 
-  /* console.log(filteredData); */
 
-  if (error && !data) {
-    console.log(error);
-  }
 
-  /*     useEffect(() => {
-        for(const elem of (filteredData || [])){
-           console.log(Object.isFrozen(elem))
-        }
-    },[]) */
 
   useEffect(() => {
     const filtered = data?.getAllSongs.filter((elem) => elem.artist_name.includes(search) || elem.song_name.includes(search));
@@ -65,8 +83,7 @@ const SongsComponent = () => {
 
   useEffect(() => {
     if (orderBySelected["key"]) {
-      console.log(orderBySelected["key"]);
-      const res = filteredData.slice().sort((a: any, b: any) => {
+      const res = filteredData?.slice().sort((a: any, b: any) => {
         if (a[orderBySelected["key"]] < b[orderBySelected["key"]]) return -1;
         if (a[orderBySelected["key"]] > b[orderBySelected["key"]]) return 1;
         return 0;
@@ -76,6 +93,22 @@ const SongsComponent = () => {
       setFilteredData(data?.getAllSongs);
     }
   }, [orderBySelected]);
+
+  const refreshData = () => {
+    refetch();
+
+    if (orderBySelected["key"]) {
+      const res = filteredData?.slice().sort((a: any, b: any) => {
+        if (a[orderBySelected["key"]] < b[orderBySelected["key"]]) return -1;
+        if (a[orderBySelected["key"]] > b[orderBySelected["key"]]) return 1;
+        return 0;
+      });
+      setFilteredData(res);
+    } else {
+      setFilteredData(data?.getAllSongs);
+    }
+  };
+
 
   /*  const orderBy = () => {
     const unsortedData = filteredData;
@@ -90,59 +123,29 @@ const SongsComponent = () => {
     setFilteredData(data?.getAllSongs);
   }
  */
-  const onSubmit = (event: any, data: SongInput) => {
-    event.preventDefault();
-    console.log(data);
-    mutationFunction({ variables: { createSongInput: { ...data } } });
+  const onSubmit = (data: any) => {
+    mutationFunction({ variables: { createSongInput: { ...data } } })
   };
 
   return (
     <>
       {/*  <FilterComponent selected={filterSelected} onSelectedChange={(item : any) => setFilterSelected(item)} options={SongFieldsFilters}/> */}
-      <SearchBarComponent onChangeText={setSearch} value={search} lightTheme={true} round={true} containerStyle={{ borderStartWidth: 0, backgroundColor: "transparent", borderBottomWidth: 0, margin: 5 }} inputContainerStyle={{ backgroundColor: "lightgray" }} placeholder="Search a song here..." />
-      <ScrollView>
-        <View style={tw.style("flex-1 flex-row mx-4 ")}>
-          {/*  <Picker style={tw.style('flex-1')} selectedValue={filterSelected} onValueChange={(item) => setFilterSelected(item)}>
-           {SongOrderBy.map(field => {
-             return <Picker.Item label={field} value={field}/>
-           })}
-           </Picker>  */}
-          <Icon
-            name="th-list"
-            size={20}
-            color="#4B5563"
-            style={tw.style("text-left")}
-            onPress={() => {
-              setCardView((prev) => !prev);
-            }}
-          />
-          <View style={tw.style("flex-1 flex-row justify-end")}>
-            {orderBySelected["key"] && (
-              <Badge
-                textStyle={tw.style("text-sm")}
-                containerStyle={tw.style("mr-1")}
-                badgeStyle={tw.style("p-2")}
-                value={`x ${orderBySelected["value"]}`}
-                status="primary"
-                onPress={() => {
-                  setOrderBySelected({});
-                }}
-              ></Badge>
-            )}
-            <Icon
-              name="sort-amount-desc"
-              size={20}
-              color="#4B5563"
-              onPress={() => {
-                setShowBottomSheet(true);
-              }}
-            ></Icon>
-          </View>
-        </View>
+      <SearchBarComponent
+        onChangeText={setSearch}
+        value={search}
+        lightTheme={true}
+        round={true}
+        containerStyle={{ borderStartWidth: 0, backgroundColor: "transparent", borderBottomWidth: 0, margin: 5 }}
+        inputContainerStyle={{ backgroundColor: "lightgray" }}
+        placeholder="Search a song here..."
+      />
+      <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refreshData} />}>
+        <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={setOrderBySelected} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
+
         <BottomSheet isVisible={showBottomSheet} containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.7)" }}>
           <ListItem containerStyle={tw.style("bg-gray-200")}>
             <ListItem.Content>
-              <ListItem.Title style={tw.style("font-bold")}>Order By:</ListItem.Title>
+              <ListItem.Title style={tw.style("font-bold")}>Order By</ListItem.Title>
             </ListItem.Content>
           </ListItem>
           {Object.keys(SongOrderBy).map((field, index) => {
@@ -160,7 +163,7 @@ const SongsComponent = () => {
                   </ListItem.Title>
                 </ListItem.Content>
               </ListItem>
-            );
+            )
           })}
           <Button buttonStyle={{ backgroundColor: colors.dangerColor.color }} raised={true} type="solid" title="Close" onPress={() => setShowBottomSheet(false)}></Button>
         </BottomSheet>
@@ -218,8 +221,7 @@ const SongsComponent = () => {
                             </Text>
                           </View>
                         </View>
-                        {/*  <View style={tw.style("flex-row justify-end")}>
-                    </View> */}
+
                       </View>
 
                       <View style={tw.style("mb-2")}>
@@ -231,7 +233,7 @@ const SongsComponent = () => {
                         <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_rhythm || 0) / 100} style={tw.style("h-4 rounded")} />
                       </View>
                       <>
-                        {song?.links && <Text>Links</Text>}
+                        {song?.links ? <Text>Links</Text> : <Text></Text>}
                         {song?.links?.split(";").map((link: any, index: number) => {
                           return (
                             <>
@@ -240,102 +242,150 @@ const SongsComponent = () => {
                                 <Text style={tw.style("text-blue-700")}> {link}</Text>
                               </Text>
                             </>
-                          );
+                          )
                         })}
                       </>
                     </TouchableOpacity>
                   </Card>
                 ) : (
                   <TouchableOpacity
-                    activeOpacity={0.9}
-                    style={tw.style("bg-gray-600 mx-3")}
+                    activeOpacity={1}
+                    style={tw.style("mx-4")}
                     key={index}
                     onPress={() => {
                       setEditSong(song);
                       setShowOverlay(true);
                     }}
                   >
-                    <ListItem containerStyle={tw.style("shadow-lg")} key={index} bottomDivider>
+                    <ListItem containerStyle={tw.style("flex-row rounded-md shadow-sm my-2")} key={index}>
                       <ListItem.Content>
-                        <ListItem.Title style={tw.style("text-lg font-bold text-gray-700")}>{song.song_name}</ListItem.Title>
-                        <ListItem.Subtitle style={tw.style("text-sm font-bold text-gray-500")}>{song.artist_name}</ListItem.Subtitle>
+                        <View style={tw.style("flex-row min-w-full items-center justify-between")}>
+                          <View style={tw.style("flex-row items-center")}>
+                          <ListItem.Title style={tw.style("text-lg font-bold text-gray-700 mr-2")}>{song.song_name}</ListItem.Title>
+                          <ListItem.Subtitle style={tw.style("text-sm font-bold text-gray-600")}>{song.artist_name}</ListItem.Subtitle>
+                          </View>
+                          <View style={tw.style("flex-row items-center")}>
+                            <Text style={tw.style("text-xs text-gray-500")}>Lesson </Text><Icon name={song?.fromLesson ? "check" : "times"} size={11} color={song?.fromLesson ? colors.successColor.color : colors.dangerColor.color} />
+                          </View>
+                        </View>
+                        <View style={tw.style("flex-col min-w-full mt-2")}>
+                          <View style={tw.style("flex-row items-center justify-between")}>
+                            <View style={tw.style("flex-row items-center")}>
+                              <Text style={tw.style("text-xs text-gray-500 mr-1")}>Melody</Text>
+
+                              <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_melody || 0) / 100} style={tw.style("w-20 h-2 rounded-sm")} />
+                            </View>
+                            <View>
+                              <Text style={tw.style("text-xs text-gray-500")}>Created {song?.createdAt?.substring(0, 10) || "N/A"}</Text>
+                            </View>
+                          </View>
+                          <View style={tw.style("flex-row items-center justify-between")}>
+                            <View style={tw.style("flex-row items-center")}>
+                              <Text style={tw.style("text-xs text-gray-500 mr-1")}>Rhythm</Text>
+                              <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_rhythm || 0) / 100} style={tw.style("w-20 h-2 rounded-sm")} />
+                            </View>
+                            <View>
+                              <Text style={tw.style("text-xs text-gray-500")}>Updated {song?.updatedAt?.substring(0, 10) || "N/A"}</Text>
+                            </View>
+                          </View>
+                        </View>
                         {/*  <ListItem.Subtitle style={tw.style('text-sm font-bold text-gray-500')}>{song.prog_melody}</ListItem.Subtitle>
+                        
                           <ListItem.Subtitle style={tw.style('text-sm font-bold text-gray-500')}>{song.prog_rhythm}</ListItem.Subtitle> */}
-                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_melody || 0) / 100} style={tw.style("h-1 mt-5 rounded")} />
-                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_rhythm || 0) / 100} style={tw.style("h-1 mt-2 rounded")} />
                       </ListItem.Content>
-                      <ListItem.Chevron size={20} />
+                      <View>
+                        <ListItem.Chevron size={20} />
+                      </View>
                     </ListItem>
                   </TouchableOpacity>
                 )}
               </>
-            );
+            )
           })}
         </View>
       </ScrollView>
-      <FABComponent onPress={() => setShowOverlay(true)} title="" size="large" icon={<Icon name="plus" size={20} color="white" />} />
+      <FABComponent
+        onPress={() => {
+          setShowOverlay(true);
+        }}
+        title=""
+        size="large"
+        icon={<Icon name="plus" size={20} color="white" />}
+      />
       <Overlay
-        overlayStyle={tw.style("m-2", { width: "95%", height: "80%" })}
+        overlayStyle={tw.style("flex-row mx-4 p-5")}
         animationType="slide"
         isVisible={showOverlay}
         onBackdropPress={() => {
-          setEditSong(undefined);
+         
           setShowOverlay(false);
         }}
       >
-        <Text style={tw.style("font-bold text-lg m-2")}>
-          {editSong?.song_name ? "Edit" : "New"} {editSong?.song_name}
-        </Text>
-        <ScrollView style={tw.style("flex flex-col")}>
-          <Controller
-            control={control}
-            /* defaultValue='' */
-            name="song_name"
-            render={({ field: { onChange, value } }) => <Input errorMessage={errors?.song_name?.message} defaultValue={editSong?.song_name} onChangeText={(text) => onChange(text)} value={value} placeholder="Song" />}
-            /*  rules={{
-              required: { value: true, message: "Song is required" },
-            }} */
+        <ScrollView>
+          <View style={tw.style("flex-row items-center justify-between")}>
+          <Text style={tw.style("font-bold text-lg m-2 text-gray-600")}>{editSong?.song_id ? "Edit" : "New"}</Text>
+          <Icon
+            name="times"
+            size={22}
+            color="#4B5563"
+            style={tw.style("mx-2")}
+            onPress={() => {
+              setEditSong(undefined);
+              setShowOverlay(false);
+            }}
           />
-          <Controller control={control} /* defaultValue="" */ name="artist_name" render={({ field: { onChange, value } }) => <Input defaultValue={editSong?.artist_name} onChangeText={(text) => onChange(text)} value={value} placeholder="Artist" />} />
-          <Controller
-            control={control}
-            defaultValue={editSong?.fromLesson || false}
-            name="fromLesson"
-            render={({ field: { onChange, value } }) => (
-              /*   <View style={tw.style("m-2")}> */
+        </View>
+
+        <Formik initialValues={editSong?.song_id ? editSong : SongEditFormValue} onSubmit={onSubmit}>
+          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue}) => {
+
+            return (
               <>
-                <CheckBox checkedColor={colors.successColor.color} title="Lesson" checked={value} onPress={() => onChange(!value)} />
+                <View style={tw.style("mx-2 mt-3")}>
+                  <StyledInput onChangeText={handleChange("song_name")} value={values.song_name} placeholder="Song Name" />
+                  <StyledInput onChangeText={handleChange("artist_name")} value={values.artist_name} placeholder="Artist Name" />
+                  <CheckBox containerStyle={tw.style("m-0 my-2 p-0 py-2 bg-white border-0")} checkedColor={colors.successColor.color} title="Lesson" checked={values.fromLesson} onPress={() => setFieldValue("fromLesson", !values.fromLesson)} />
+                  <View style={tw.style("my-2")}> 
+                  <Text>Melody Progress - {values.prog_melody || 0}</Text>
+                  <Slider
+                    thumbStyle={tw.style("h-4 w-4 bg-gray-800")}
+                    step={5}
+                    minimumValue={0}
+                    maximumValue={100}
+                    value={values.prog_melody || 0}
+                    onValueChange={(value) => {
+                      setFieldValue('prog_melody', value)
+                    }}
+                    />
+                  </View>
+                  <View style={tw.style("my-2")}> 
+                  <Text>Rhythm Progress - {values.prog_rhythm || 0}</Text>
+                  <Slider
+                    thumbStyle={tw.style("h-4 w-4 bg-gray-800")}
+                    step={5}
+                    minimumValue={0}
+                    maximumValue={100}
+                    value={values.prog_rhythm || 0}
+                    onValueChange={(value) => {
+                     setFieldValue('prog_rhythm', value)
+                    }}
+                    />
+                  </View>
+                  <TextInput multiline={true} numberOfLines={5} style={tw.style("px-2 border border-gray-400",{ textAlignVertical: "center" })} defaultValue={values.links as string} onChangeText={(text) => setFieldValue('links', text)} value={values.links} placeholder="Links" />
+                </View>
+                <View style={tw.style("mx-2 mt-8 mb-2")}>
+                  <Button buttonStyle={[{ backgroundColor: colors.successColor.color }, tw.style("rounded-full")]} type="solid" title="Save" onPress={() => handleSubmit()}></Button>
+                </View>
               </>
-              /*    </View> */
-            )}
-          />
-          <Controller
-            control={control}
-            defaultValue={editSong?.prog_melody || 0}
-            name="prog_melody"
-            render={({ field: { onChange, value } }) => (
-              <View style={tw.style("m-3")}>
-                <Text style={tw.style("text-gray-500")}>Melody Progress : {value}</Text>
-                <Slider thumbStyle={tw.style("h-4 w-4 bg-gray-900")} step={5} minimumValue={0} maximumValue={100} value={value} onValueChange={(value) => onChange(value)} />
-              </View>
-            )}
-          />
-          <Controller
-            control={control}
-            defaultValue={editSong?.prog_rhythm || 0}
-            name="prog_rhythm"
-            render={({ field: { onChange, value } }) => (
-              <View style={tw.style("m-3")}>
-                <Text style={tw.style("text-gray-500")}>Rhythm Progress : {editSong?.prog_rhythm}</Text>
-                <Slider thumbStyle={tw.style("h-4 w-4 bg-gray-900")} step={5} minimumValue={0} maximumValue={100} value={editSong?.prog_rhythm} onValueChange={(value) => {onChange(value); setEditSong((prev:any) => {return {...prev, prog_rhythm : value}} )}} />
-              </View>
-            )}
-          />
-          <Button onPress={handleSubmit((data, event) => onSubmit(event, data))} title="Save" />
+            )}}
+        </Formik> 
         </ScrollView>
+
+
+
       </Overlay>
     </>
-  );
-};
+  )
+}
 
 export default SongsComponent;

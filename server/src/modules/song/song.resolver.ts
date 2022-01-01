@@ -13,13 +13,15 @@ export const SongResolver : SongResolvers = {
     },
     Mutation: {
         createSong: async (parent: any, args: any, context: any) => {
-            return await db.song.create({
+           const res = await db.song.create({
                 data: {
                     ...args.input,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
             });
+            console.log(res);
+            return res;
         },
         updateSong: async (parent: any, args: any, context: any) => {
             return await db.song.update({

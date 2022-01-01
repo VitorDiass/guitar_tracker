@@ -19,7 +19,7 @@ type Query {
 }
 
 type Mutation {
-  createSong(input: SongInput): String
+  createSong(input: SongInput!): Song!
   updateSong(input: SongInput!): Song!
   deleteSong(song_id: ID!): Song
 }
@@ -30,5 +30,6 @@ input SongInput {
   prog_melody: Int
   prog_rhythm: Int
   fromLesson: Boolean
+  links : String
 }
 

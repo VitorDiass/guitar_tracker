@@ -212,8 +212,11 @@ export type Song = {
 export type SongInput = {
   artist_name?: Maybe<Scalars['String']>;
   fromLesson?: Maybe<Scalars['Boolean']>;
+  instrument_type?: Maybe<Scalars['Int']>;
+  links?: Maybe<Scalars['String']>;
   prog_melody?: Maybe<Scalars['Int']>;
   prog_rhythm?: Maybe<Scalars['Int']>;
+  song_id?: Maybe<Scalars['String']>;
   song_name?: Maybe<Scalars['String']>;
 };
 

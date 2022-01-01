@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 import {Picker} from '@react-native-picker/picker';
-import { SongOrderBy } from '../helpers/song.filter';
+import { SongOrderBy } from '../helpers/song';
 
 const FilterComponent = ({selected, onSelectedChange, options} : any) => {
     return (

@@ -8,6 +8,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { client } from "./graphql/apollo/apollo";
+import Toast from 'react-native-toast-message';
 
 
 
@@ -20,6 +21,7 @@ export default function App() {
             <StatusBar />
             <NavigationComponent/>
           </View>
+          <Toast/>
         </SafeAreaProvider>
       </NavigationContainer>
     </ApolloProvider>
