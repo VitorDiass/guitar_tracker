@@ -24,17 +24,19 @@ export const SongResolver : SongResolvers = {
             return res;
         },
         updateSong: async (parent: any, args: any, context: any) => {
-            return await db.song.update({
+            const res = await db.song.update({
                 where: { song_id: args.input?.song_id },
                 data: {
                     ...args.input,
                     updatedAt: new Date(),
                 },
             });
+            console.log(res);
+            return res;
         },
         deleteSong : async(parent: any, args: any, context: any) => {
             return await db.song.delete({
-                where : {song_id : args.song_id}
+                where : {song_id : args.input.song_id}
             })
         }
     },

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { View, ScrollView, Linking, TouchableOpacity, Pressable, TouchableHighlight, TextInput, RefreshControl } from "react-native";
-import { GET_ALL_SONGS, SAVE_NEW_SONG } from "../graphql/song.graphql";
+import { View, ScrollView, Linking, TouchableOpacity, Pressable, TouchableHighlight, TextInput, RefreshControl, Alert} from "react-native";
+import { GET_ALL_SONGS, SAVE_NEW_SONG, SAVE_EDIT_SONG, DELETE_SONG } from "../graphql/song.graphql";
 import { GetAllSongsQuery, SongInput } from "../graphql/types";
 import { Card, Overlay, Text, BottomSheet, ListItem, Button, Badge, Input, Slider, CheckBox } from "react-native-elements";
 import tw from "tailwind-react-native-classnames";
@@ -20,6 +20,7 @@ import OptionsBarComponent from "./optionsBar";
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import StyledInput from "./input";
 import Toast from 'react-native-toast-message';
+import AlertDialog from "./alertdialog";
 
 const SongsComponent = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -43,6 +44,24 @@ const SongsComponent = () => {
   if(error){
     console.log(error)
   }
+
+  const [editSongMutation, ...editSongMutationParams] = useMutation(SAVE_EDIT_SONG,{
+    onCompleted : (data) => {
+      setShowOverlay(false);
+      Toast.show({
+        type : 'success',
+        text1 : 'Edit Song',
+        text2 : 'Edited song  successfully',
+        position : 'bottom',
+        visibilityTime : 3000,
+        bottomOffset : 100
+      })
+     },
+     onError : (error) => {
+       console.log("ERRO")
+       console.log(JSON.stringify(error, null, 2));
+     }
+  })
   
 
   const [mutationFunction, ...params] = useMutation(SAVE_NEW_SONG, {
@@ -60,8 +79,26 @@ const SongsComponent = () => {
    onError : (error) => {
      console.log(error)
    }
-    
   });
+
+  const [deleteSongMutation, ...deleteSongMutationParams] = useMutation(DELETE_SONG,{
+    onCompleted : (data) => {
+      setShowOverlay(false);
+      refreshData();
+      Toast.show({
+        type : 'success',
+        text1 : 'Delete song',
+        text2 : 'Deleted song  successfully',
+        position : 'bottom',
+        visibilityTime : 3000,
+        bottomOffset : 100
+      })
+     },
+     onError : (error) => {
+       console.log("ERRO")
+       console.log(JSON.stringify(error, null, 2));
+     }
+  })
 
   const [filteredData, setFilteredData] = useState<any>(data?.getAllSongs);
 
@@ -124,8 +161,14 @@ const SongsComponent = () => {
   }
  */
   const onSubmit = (data: any) => {
-    mutationFunction({ variables: { createSongInput: { ...data } } })
+    data.song_id ? editSongMutation({ variables: { editSongInput: { ...data } } }) : mutationFunction({ variables: { createSongInput: { ...data } } });
   };
+
+  const onDelete = () => {
+   if(editSong?.song_id){
+    deleteSongMutation({variables : {deleteSongInput : {song_id : editSong.song_id}}})
+   }
+  }
 
   return (
     <>
@@ -136,11 +179,11 @@ const SongsComponent = () => {
         lightTheme={true}
         round={true}
         containerStyle={{ borderStartWidth: 0, backgroundColor: "transparent", borderBottomWidth: 0, margin: 5 }}
-        inputContainerStyle={{ backgroundColor: "lightgray" }}
+        inputContainerStyle={[tw.style("rounded-full"),{ backgroundColor: "lightgray" }]}
         placeholder="Search a song here..."
       />
+      <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={setOrderBySelected} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
       <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refreshData} />}>
-        <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={setOrderBySelected} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
 
         <BottomSheet isVisible={showBottomSheet} containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.7)" }}>
           <ListItem containerStyle={tw.style("bg-gray-200")}>
@@ -224,13 +267,13 @@ const SongsComponent = () => {
 
                       </View>
 
-                      <View style={tw.style("mb-2")}>
-                        <Text>Melody Progress</Text>
-                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_melody || 0) / 100} style={tw.style("h-4 rounded")} />
+                      <View style={tw.style("mb-3")}>
+                        <Text style={tw.style("text-xs mb-1")}>Melody Progress - {song?.prog_melody} %</Text>
+                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_melody || 0) / 100} style={tw.style("h-3 rounded-full")} />
                       </View>
-                      <View style={tw.style("mb-4")}>
-                        <Text>Rhythm Progress</Text>
-                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_rhythm || 0) / 100} style={tw.style("h-4 rounded")} />
+                      <View>
+                        <Text style={tw.style("text-xs mb-1")}>Rhythm Progress - {song?.prog_rhythm} %</Text>
+                        <ProgressBarComponent dynamicBarColor={true} value={(song?.prog_rhythm || 0) / 100} style={tw.style("h-3 rounded-full")} />
                       </View>
                       <>
                         {song?.links ? <Text>Links</Text> : <Text></Text>}
@@ -260,7 +303,7 @@ const SongsComponent = () => {
                     <ListItem containerStyle={tw.style("flex-row rounded-md shadow-sm my-2")} key={index}>
                       <ListItem.Content>
                         <View style={tw.style("flex-row min-w-full items-center justify-between")}>
-                          <View style={tw.style("flex-row items-center")}>
+                          <View style={tw.style("flex-row flex-wrap flex-shrink items-center")}>
                           <ListItem.Title style={tw.style("text-lg font-bold text-gray-700 mr-2")}>{song.song_name}</ListItem.Title>
                           <ListItem.Subtitle style={tw.style("text-sm font-bold text-gray-600")}>{song.artist_name}</ListItem.Subtitle>
                           </View>
@@ -376,6 +419,13 @@ const SongsComponent = () => {
                 <View style={tw.style("mx-2 mt-8 mb-2")}>
                   <Button buttonStyle={[{ backgroundColor: colors.successColor.color }, tw.style("rounded-full")]} type="solid" title="Save" onPress={() => handleSubmit()}></Button>
                 </View>
+                {editSong?.song_id ?
+                  <View style={tw.style("mx-2 mb-2")}>
+                    <Button buttonStyle={[{ backgroundColor: colors.dangerColor.color }, tw.style("rounded-full")]} type="solid" title="Delete" onPress={() => {AlertDialog("Are you sure?","Are you sure you want to delete this?","Yes","No",onDelete)}}></Button>
+                  </View>
+                  :
+                  <></>
+                }
               </>
             )}}
         </Formik> 

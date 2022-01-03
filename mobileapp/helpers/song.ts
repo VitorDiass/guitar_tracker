@@ -27,21 +27,23 @@ export interface Song extends SongKeys{
 
 
 interface SongFormValue {
+  song_id : string | undefined
   artist_name : string
   song_name : string
   prog_melody : number
   prog_rhythm : number
   fromLesson : boolean
-  links : string
+  links : string | undefined
 }
 
 
 
 export const SongEditFormValue : SongFormValue = {
+  song_id : undefined,
   artist_name : '',
   song_name : '',
   prog_melody : 0,
   prog_rhythm : 0,
   fromLesson : false,
-  links : ''
+  links : undefined
 }

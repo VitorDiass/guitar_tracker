@@ -45,8 +45,8 @@ const ProgressBarComponent = (props : LinearProgressProps & ProgressBarInterface
 
     return (
         <>
-        <LinearProgress {...props} color={color} trackColor={trackColor} variant={variant} value={value}/>
-    </>
+            <LinearProgress {...props} color={color} trackColor={trackColor} variant={variant} value={value}/>
+        </>
     )
 }
 

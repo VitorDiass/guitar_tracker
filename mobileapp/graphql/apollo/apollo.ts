@@ -10,6 +10,8 @@ const URI = "http://192.168.244.253:4000/";
 
 export const client = new ApolloClient({
     uri: URI,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      addTypename : false
+    }),
   
 });

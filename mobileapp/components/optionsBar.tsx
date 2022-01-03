@@ -7,7 +7,7 @@ import IconFontAwesome from 'react-native-vector-icons/FontAwesome'
 
 const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShowBottomSheet, orderBySelected} : any) => {
     return (
-      <View style={tw.style("flex-row items-center mx-4 px-1")}>
+      <View style={tw.style("flex-row items-center mx-4 px-1 mb-2")}>
         {/*  <Picker style={tw.style('flex-1')} selectedValue={filterSelected} onValueChange={(item) => setFilterSelected(item)}>
          {SongOrderBy.map(field => {
            return <Picker.Item label={field} value={field}/>
