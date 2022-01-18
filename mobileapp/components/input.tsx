@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, TextInput } from 'react-native'
+import { TextInput } from 'react-native'
 import tw from 'tailwind-react-native-classnames'
 
 const StyledInput = (props : any) => {

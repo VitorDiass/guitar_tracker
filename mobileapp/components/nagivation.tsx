@@ -41,13 +41,13 @@ const NavigationComponent = () => {
         name="Songs"
         component={SongsComponent}
       />
-      <Tab.Screen
+     {/*  <Tab.Screen
         options={{
           tabBarIcon: ({ focused, size, color }) => <Icon name="user" size={35} color={color} />
         }}
         name="Home"
-        component={() => <Text>HOME</Text>}
-      />
+        component={() => {}}
+      /> */}
     </Tab.Navigator>
   );
 };

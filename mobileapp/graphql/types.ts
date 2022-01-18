@@ -155,10 +155,14 @@ export type Scalars = {
   Void: any;
 };
 
+export type DeleteSongInput = {
+  song_id: Scalars['ID'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createSong: Song;
-  deleteSong?: Maybe<Song>;
+  deleteSong: Song;
   updateSong: Song;
 };
 
@@ -169,7 +173,7 @@ export type MutationCreateSongArgs = {
 
 
 export type MutationDeleteSongArgs = {
-  song_id: Scalars['ID'];
+  input: DeleteSongInput;
 };
 
 
@@ -179,7 +183,7 @@ export type MutationUpdateSongArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getAllSongs: Array<Song>;
+  getAllSongs: Array<Maybe<Song>>;
   getAllUsers: Array<User>;
   getSong?: Maybe<Song>;
   getUser?: Maybe<User>;
@@ -211,13 +215,15 @@ export type Song = {
 
 export type SongInput = {
   artist_name?: Maybe<Scalars['String']>;
+  createdAt?: Maybe<Scalars['DateTime']>;
   fromLesson?: Maybe<Scalars['Boolean']>;
   instrument_type?: Maybe<Scalars['Int']>;
   links?: Maybe<Scalars['String']>;
   prog_melody?: Maybe<Scalars['Int']>;
   prog_rhythm?: Maybe<Scalars['Int']>;
-  song_id?: Maybe<Scalars['String']>;
+  song_id?: Maybe<Scalars['ID']>;
   song_name?: Maybe<Scalars['String']>;
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type User = {
@@ -305,6 +311,7 @@ export type ResolversTypes = ResolversObject<{
   Currency: ResolverTypeWrapper<Scalars['Currency']>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
+  DeleteSongInput: DeleteSongInput;
   Duration: ResolverTypeWrapper<Scalars['Duration']>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']>;
   GUID: ResolverTypeWrapper<Scalars['GUID']>;
@@ -370,6 +377,7 @@ export type ResolversParentTypes = ResolversObject<{
   Currency: Scalars['Currency'];
   Date: Scalars['Date'];
   DateTime: Scalars['DateTime'];
+  DeleteSongInput: DeleteSongInput;
   Duration: Scalars['Duration'];
   EmailAddress: Scalars['EmailAddress'];
   GUID: Scalars['GUID'];
@@ -537,7 +545,7 @@ export interface MacScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes[
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<MutationCreateSongArgs, 'input'>>;
-  deleteSong?: Resolver<Maybe<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<MutationDeleteSongArgs, 'song_id'>>;
+  deleteSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<MutationDeleteSongArgs, 'input'>>;
   updateSong?: Resolver<ResolversTypes['Song'], ParentType, ContextType, RequireFields<MutationUpdateSongArgs, 'input'>>;
 }>;
 
@@ -594,7 +602,7 @@ export interface PostalCodeScalarConfig extends GraphQLScalarTypeConfig<Resolver
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  getAllSongs?: Resolver<Array<ResolversTypes['Song']>, ParentType, ContextType>;
+  getAllSongs?: Resolver<Array<Maybe<ResolversTypes['Song']>>, ParentType, ContextType>;
   getAllUsers?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   getSong?: Resolver<Maybe<ResolversTypes['Song']>, ParentType, ContextType, RequireFields<QueryGetSongArgs, 'song_id'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
@@ -734,7 +742,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
 export type GetAllSongsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllSongsQuery = { __typename?: 'Query', getAllSongs: Array<{ __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> }> };
+export type GetAllSongsQuery = { __typename?: 'Query', getAllSongs: Array<Maybe<{ __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> }>> };
 
 export type CreateSongMutationMutationVariables = Exact<{
   createSongInput: SongInput;
@@ -742,3 +750,17 @@ export type CreateSongMutationMutationVariables = Exact<{
 
 
 export type CreateSongMutationMutation = { __typename?: 'Mutation', createSong: { __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> } };
+
+export type EditSongMutationMutationVariables = Exact<{
+  editSongInput: SongInput;
+}>;
+
+
+export type EditSongMutationMutation = { __typename?: 'Mutation', updateSong: { __typename?: 'Song', song_id: string, artist_name: string, song_name: string, prog_melody: number, prog_rhythm: number, fromLesson?: Maybe<boolean>, instrument_type?: Maybe<number>, links?: Maybe<string>, updatedAt?: Maybe<any>, createdAt?: Maybe<any> } };
+
+export type DeleteSongMutationMutationVariables = Exact<{
+  deleteSongInput: DeleteSongInput;
+}>;
+
+
+export type DeleteSongMutationMutation = { __typename?: 'Mutation', deleteSong: { __typename?: 'Song', song_id: string } };

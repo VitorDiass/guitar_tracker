@@ -15,7 +15,7 @@ type Song {
 
 type Query {
   getSong(song_id: ID!): Song
-  getAllSongs: [Song!]!
+  getAllSongs: [Song]!
 }
 
 type Mutation {

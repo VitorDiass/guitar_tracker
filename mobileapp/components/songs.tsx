@@ -1,84 +1,91 @@
 import React, { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { View, ScrollView, Linking, TouchableOpacity, Pressable, TouchableHighlight, TextInput, RefreshControl, Alert} from "react-native";
-import { GET_ALL_SONGS, SAVE_NEW_SONG, SAVE_EDIT_SONG, DELETE_SONG } from "../graphql/song.graphql";
-import { GetAllSongsQuery, SongInput } from "../graphql/types";
+import { View, ScrollView, Linking, TouchableOpacity, TextInput, RefreshControl} from "react-native";
 import { Card, Overlay, Text, BottomSheet, ListItem, Button, Badge, Input, Slider, CheckBox } from "react-native-elements";
+
+//GRAPHQL
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_ALL_SONGS, SAVE_NEW_SONG, SAVE_EDIT_SONG, DELETE_SONG } from "../graphql/song.graphql";
+import { GetAllSongsQuery } from "../graphql/types";
+import { SongOrderBy, SongEditFormValue, Song } from "../helpers/song";
+
+//STYLES
 import tw from "tailwind-react-native-classnames";
 import { colors } from "../styles/global";
-import { useIsFocused } from "@react-navigation/core";
-import { SearchBarBaseProps, SearchBarProps } from "react-native-elements/dist/searchbar/SearchBar";
 import Icon from "react-native-vector-icons/FontAwesome";
-import SearchBarComponent from "./searchbar";
+
+//COMPONENTS
+import { Formik } from 'formik';
 import FABComponent from "./fab";
+import SearchBarComponent from "./searchbar";
 import ProgressBarComponent from "./progressbar";
-import FilterComponent from "./filter";
-import { SongOrderBy, SongEditFormValue, Song } from "../helpers/song";
-import { Picker } from "@react-native-picker/picker";
-import { Controller, useForm } from "react-hook-form";
 import OptionsBarComponent from "./optionsBar";
-import { Formik, Field, Form, ErrorMessage } from 'formik';
 import StyledInput from "./input";
 import Toast from 'react-native-toast-message';
 import AlertDialog from "./alertdialog";
 
 const SongsComponent = () => {
+  //ScrollView refresh
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  //Song being edited
   const [editSong, setEditSong] = useState<Song>();
-  const [orderBySelected, setOrderBySelected] = useState<any>({ key: "createdAt", value: "Date Created" });
-  const [showBottomSheet, setShowBottomSheet] = useState(false);
-  const [search, setSearch] = useState("");
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
-  const [value, changeValue] = useState('ola');
+
+  //orderby ASC
+  const [orderBySelected, setOrderBySelected] = useState<any>({ key : "createdAt", value : "Created Date"});
+  
+  //BottomSheet for orderby
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  
+  //Search bar query
+  const [search, setSearch] = useState("");
+  
+  //Compact/full view
   const [cardView, setCardView] = useState<boolean>(true);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-
+  
+  
+  //GRAPHQL queries/mutations
   const { data, loading, error, refetch } = useQuery<GetAllSongsQuery>(GET_ALL_SONGS);
 
-  if(error){
-    console.log(error)
-  }
+  const [viewData, setViewData] = useState<Array<any> | undefined>(data?.getAllSongs);
 
-  const [editSongMutation, ...editSongMutationParams] = useMutation(SAVE_EDIT_SONG,{
-    onCompleted : (data) => {
+  //data filtered by search bar
+  const [filteredData, setFilteredData] = useState<any>([]);
+
+  const [editSongMutation, ...editSongMutationParams] = useMutation(SAVE_EDIT_SONG, {
+    onCompleted: (data) => {
       setShowOverlay(false);
+      refreshData();
       Toast.show({
-        type : 'success',
-        text1 : 'Edit Song',
-        text2 : 'Edited song  successfully',
-        position : 'bottom',
-        visibilityTime : 3000,
-        bottomOffset : 100
-      })
-     },
-     onError : (error) => {
-       console.log("ERRO")
-       console.log(JSON.stringify(error, null, 2));
-     }
-  })
-  
+        type: "success",
+        text1: "Edit Song",
+        text2: "Edited song  successfully",
+        position: "bottom",
+        visibilityTime: 3000,
+        bottomOffset: 100,
+      });
+    },
+    onError: (error) => {
+      console.log(JSON.stringify(error, null, 2));
+    },
+  });
 
-  const [mutationFunction, ...params] = useMutation(SAVE_NEW_SONG, {
-   onCompleted : (data) => {
-    setShowOverlay(false);
-    Toast.show({
-      type : 'success',
-      text1 : 'New Song',
-      text2 : 'New song created successfully',
-      position : 'bottom',
-      visibilityTime : 3000,
-      bottomOffset : 100
-    })
-   },
-   onError : (error) => {
-     console.log(error)
-   }
+  const [saveSongMutation, ...params] = useMutation(SAVE_NEW_SONG, {
+    onCompleted: (data) => {
+      setShowOverlay(false);
+      refreshData();
+      Toast.show({
+        type: "success",
+        text1: "New Song",
+        text2: "New song created successfully",
+        position: "bottom",
+        visibilityTime: 3000,
+        bottomOffset: 100,
+      });
+    },
+    onError: (error) => {
+      console.log(JSON.stringify(error, null, 2));
+    },
   });
 
   const [deleteSongMutation, ...deleteSongMutationParams] = useMutation(DELETE_SONG,{
@@ -95,73 +102,79 @@ const SongsComponent = () => {
       })
      },
      onError : (error) => {
-       console.log("ERRO")
        console.log(JSON.stringify(error, null, 2));
      }
   })
 
-  const [filteredData, setFilteredData] = useState<any>(data?.getAllSongs);
-
-
-
-
   useEffect(() => {
-    const filtered = data?.getAllSongs.filter((elem) => elem.artist_name.includes(search) || elem.song_name.includes(search));
-    setFilteredData(filtered);
-  }, [search]);
-
-  useEffect(() => {
-    setFilteredData(data?.getAllSongs);
+    setViewData(data?.getAllSongs);
+    //setFilteredData(data?.getAllSongs);
   }, [data]);
 
-  const showOverlayFn = () => {
-    setShowOverlay(true);
-  };
+ /*  useEffect(() => {
+    if(!search || search == ''){
+      setViewData(data?.getAllSongs);
+    }
+  }, [search]); */
+
+
 
   useEffect(() => {
-    if (orderBySelected["key"]) {
-      const res = filteredData?.slice().sort((a: any, b: any) => {
-        if (a[orderBySelected["key"]] < b[orderBySelected["key"]]) return -1;
-        if (a[orderBySelected["key"]] > b[orderBySelected["key"]]) return 1;
-        return 0;
-      });
-      setFilteredData(res);
-    } else {
-      setFilteredData(data?.getAllSongs);
-    }
+    //if orderby is defined, order by the on that is defined
+    //if there is no orderby, order by created at
+    orderBySelected['key'] ? setViewData(orderBy(viewData,orderBySelected['key'])) : setViewData(orderBy(viewData,"createdAt"))
+
   }, [orderBySelected]);
 
   const refreshData = () => {
     refetch();
-
-    if (orderBySelected["key"]) {
-      const res = filteredData?.slice().sort((a: any, b: any) => {
-        if (a[orderBySelected["key"]] < b[orderBySelected["key"]]) return -1;
-        if (a[orderBySelected["key"]] > b[orderBySelected["key"]]) return 1;
-        return 0;
-      });
-      setFilteredData(res);
-    } else {
-      setFilteredData(data?.getAllSongs);
-    }
+    setSearch('');
+    setOrderBySelected({});
+    setViewData(data?.getAllSongs);
   };
 
+  const orderBy = (dataToSort: Array<any> | undefined, orderByKey: string) => {
+    console.log(orderByKey)
+    let sortedData : any = [];
+    if (dataToSort) {
+      //if(orderBySelected['key']){
+        console.log(dataToSort, orderByKey)
+        sortedData = dataToSort?.slice().sort((a: any, b: any) => {
+          if (a[orderByKey] < b[orderByKey]) return -1;
+          if (a[orderByKey] > b[orderByKey]) return 1;
+          return 0;
+        });
+        return sortedData;
+      /* }else{
+        return dataToSort;
+      } */
+    }
+    return sortedData;
+  };
 
-  /*  const orderBy = () => {
-    const unsortedData = filteredData;
-    console.log("data", unsortedData)
-    if(orderBySelected){
-      const res = unsortedData.slice().sort((a:any,b:any) => console.log(a['song_name']))
-      setFilteredData(res)
+  const filterData = (dataToFilter : Array<any> | undefined) => {
+    return dataToFilter?.filter((elem : Song) => elem.artist_name.includes(search) || elem.song_name.includes(search));
+  }
+
+  const submitFilterTextInput = () => {
+    if(search){
+      //apply filter to the data
+      setViewData(filterData(data?.getAllSongs))
+
+    }else{
+      //filter is empty
+      //reset the data to its original content
+      setViewData(data?.getAllSongs);
     }
   }
+ 
 
-  const clearOrderBy = () => {
-    setFilteredData(data?.getAllSongs);
+  const updateOrderBy = (orderByObj : any) => {
+    setOrderBySelected(orderByObj);
   }
- */
+
   const onSubmit = (data: any) => {
-    data.song_id ? editSongMutation({ variables: { editSongInput: { ...data } } }) : mutationFunction({ variables: { createSongInput: { ...data } } });
+    data.song_id ? editSongMutation({ variables: { editSongInput: { ...data } } }) : saveSongMutation({ variables: { createSongInput: { ...data } } });
   };
 
   const onDelete = () => {
@@ -181,10 +194,11 @@ const SongsComponent = () => {
         containerStyle={{ borderStartWidth: 0, backgroundColor: "transparent", borderBottomWidth: 0, margin: 5 }}
         inputContainerStyle={[tw.style("rounded-full"),{ backgroundColor: "lightgray" }]}
         placeholder="Search a song here..."
+        onSubmitEditing={submitFilterTextInput}
+        onClear={() => {setSearch(''); setViewData(data?.getAllSongs || [])}}
       />
-      <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={setOrderBySelected} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
+      <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={updateOrderBy} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
       <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refreshData} />}>
-
         <BottomSheet isVisible={showBottomSheet} containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.7)" }}>
           <ListItem containerStyle={tw.style("bg-gray-200")}>
             <ListItem.Content>
@@ -196,7 +210,7 @@ const SongsComponent = () => {
               <ListItem
                 key={index}
                 onPress={() => {
-                  setOrderBySelected({ key: field, value: SongOrderBy[field] });
+                  setOrderBySelected({key : field, value : SongOrderBy[field]})
                   setShowBottomSheet(false);
                 }}
               >
@@ -211,7 +225,7 @@ const SongsComponent = () => {
           <Button buttonStyle={{ backgroundColor: colors.dangerColor.color }} raised={true} type="solid" title="Close" onPress={() => setShowBottomSheet(false)}></Button>
         </BottomSheet>
         <View style={tw.style("mt-5")}>
-          {filteredData?.map((song: any, index: number) => {
+          {viewData?.map((song: any, index: number) => {
             return (
               <>
                 {cardView ? (
@@ -234,9 +248,9 @@ const SongsComponent = () => {
                             name="chevron-right"
                             size={20}
                             color="#4B5563"
-                            onPress={() => {
+                           /*  onPress={() => {
                               setShowBottomSheet(true);
-                            }}
+                            }} */
                           />
                         </View>
                       </View>

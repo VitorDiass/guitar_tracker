@@ -12,7 +12,6 @@ const AlertDialog = (dialogTitle : string, dialogSubTitle : string, buttonYesTex
                     text : buttonYesText,
                     onPress : () => {
                         nextFunctionCall();
-                        //handleShowDialog((prev : boolean) => {return !prev});
                     }
                 },
                 {

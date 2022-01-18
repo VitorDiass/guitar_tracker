@@ -3,11 +3,12 @@ import { View, Text } from 'react-native'
 import { Badge } from 'react-native-elements'
 import tw from 'tailwind-react-native-classnames'
 import IconMaterial from "react-native-vector-icons/MaterialIcons"
-import IconFontAwesome from 'react-native-vector-icons/FontAwesome'
+import IconFontAwesome from 'react-native-vector-icons/FontAwesome5'
 
 const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShowBottomSheet, orderBySelected} : any) => {
     return (
-      <View style={tw.style("flex-row items-center mx-4 px-1 mb-2")}>
+      <>
+      <View style={tw.style("flex flex-row items-center mx-4 mb-1")}>
         {/*  <Picker style={tw.style('flex-1')} selectedValue={filterSelected} onValueChange={(item) => setFilterSelected(item)}>
          {SongOrderBy.map(field => {
            return <Picker.Item label={field} value={field}/>
@@ -34,7 +35,25 @@ const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShow
             }}
           />
         )}
-
+          <Badge  
+       textStyle={tw.style("text-xs")}
+       containerStyle={tw.style("mr-1")}
+       badgeStyle={tw.style("rounded-full p-3")}
+       value={`From Lesson`}
+       status="primary"
+       onPress={() => {
+         //setOrderBySelected({});
+       }}></Badge>
+       <Badge  
+       textStyle={tw.style("text-xs")}
+       containerStyle={tw.style("mr-1")}
+       badgeStyle={tw.style("rounded-full p-3")}
+       value={`Complete`}
+       status="primary"
+       onPress={() => {
+         //setOrderBySelected({});
+       }}></Badge>
+       
         <View style={tw.style("flex-1 flex-row items-center justify-end")}>
           {orderBySelected["key"] && (
             <Badge
@@ -49,7 +68,7 @@ const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShow
             ></Badge>
           )}
           <IconFontAwesome
-            name="sort-amount-desc"
+            name="sort-amount-up-alt"
             size={20}
             color="#4B5563"
             onPress={() => {
@@ -58,6 +77,10 @@ const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShow
           />
         </View>
       </View>
+      <View style={tw.style("flex flex-row mx-4")}>
+     
+       </View>
+       </>
     );
 }
 
