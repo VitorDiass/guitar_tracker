@@ -70,16 +70,21 @@ exports.SongResolver = {
     },
     Mutation: {
         createSong: function (parent, args, context) { return __awaiter(void 0, void 0, void 0, function () {
+            var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, database_1.db.song.create({
                             data: __assign(__assign({}, args.input), { createdAt: new Date(), updatedAt: new Date() })
                         })];
-                    case 1: return [2 /*return*/, _a.sent()];
+                    case 1:
+                        res = _a.sent();
+                        console.log(res);
+                        return [2 /*return*/, res];
                 }
             });
         }); },
         updateSong: function (parent, args, context) { return __awaiter(void 0, void 0, void 0, function () {
+            var res;
             var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -87,7 +92,10 @@ exports.SongResolver = {
                             where: { song_id: (_a = args.input) === null || _a === void 0 ? void 0 : _a.song_id },
                             data: __assign(__assign({}, args.input), { updatedAt: new Date() })
                         })];
-                    case 1: return [2 /*return*/, _b.sent()];
+                    case 1:
+                        res = _b.sent();
+                        console.log(res);
+                        return [2 /*return*/, res];
                 }
             });
         }); },
@@ -95,7 +103,7 @@ exports.SongResolver = {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, database_1.db.song["delete"]({
-                            where: { song_id: args.song_id }
+                            where: { song_id: args.input.song_id }
                         })];
                     case 1: return [2 /*return*/, _a.sent()];
                 }

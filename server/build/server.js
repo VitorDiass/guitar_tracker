@@ -26,7 +26,7 @@ var schema = (0, schema_1.makeExecutableSchema)({
     //Date : GraphQLDate,
 });
 var server = new apollo_server_1.ApolloServer({ schema: schema });
-server.listen().then(function (_a) {
+server.listen({ port: process.env.PORT || 4444 }).then(function (_a) {
     var url = _a.url;
     return console.log("server is ready at " + url);
 });
