@@ -22,6 +22,6 @@ const schema = makeExecutableSchema({
 })
 
  
-const server = new ApolloServer({schema});
+const server = new ApolloServer({cors : {origin : 'https://studio.apollographql.com', methods : 'POST'},schema});
 
 server.listen({port : process.env.PORT || 4444}).then(({url}) => console.log(`server is ready at ${url}`))
