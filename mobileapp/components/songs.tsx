@@ -52,6 +52,7 @@ const SongsComponent = () => {
   //data filtered by search bar
   const [filteredData, setFilteredData] = useState<any>([]);
 
+
   const [editSongMutation, ...editSongMutationParams] = useMutation(SAVE_EDIT_SONG, {
     onCompleted: (data) => {
       setShowOverlay(false);
@@ -152,14 +153,14 @@ const SongsComponent = () => {
     return sortedData;
   };
 
-  const filterData = (dataToFilter : Array<any> | undefined) => {
+  const filterDataByNames = (dataToFilter : Array<any> | undefined) => {
     return dataToFilter?.filter((elem : Song) => elem.artist_name.includes(search) || elem.song_name.includes(search));
   }
 
   const submitFilterTextInput = () => {
     if(search){
       //apply filter to the data
-      setViewData(filterData(data?.getAllSongs))
+      setViewData(filterDataByNames(data?.getAllSongs))
 
     }else{
       //filter is empty
@@ -197,7 +198,7 @@ const SongsComponent = () => {
         onSubmitEditing={submitFilterTextInput}
         onClear={() => {setSearch(''); setViewData(data?.getAllSongs || [])}}
       />
-      <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={updateOrderBy} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected} />
+      <OptionsBarComponent cardView={cardView} setCardView={setCardView} setOrderBySelected={updateOrderBy} setShowBottomSheet={setShowBottomSheet} orderBySelected={orderBySelected}/>
       <ScrollView refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refreshData} />}>
         <BottomSheet isVisible={showBottomSheet} containerStyle={{ backgroundColor: "rgba(0.5, 0.25, 0, 0.7)" }}>
           <ListItem containerStyle={tw.style("bg-gray-200")}>

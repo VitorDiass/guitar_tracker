@@ -35,10 +35,11 @@ const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShow
             }}
           />
         )}
-          <Badge  
+     {/*  <View style={tw.style("flex flex-row ml-1")}>
+      <Badge  
        textStyle={tw.style("text-xs")}
        containerStyle={tw.style("mr-1")}
-       badgeStyle={tw.style("rounded-full p-3")}
+       badgeStyle={tw.style("rounded-full py-3 px-1")}
        value={`From Lesson`}
        status="primary"
        onPress={() => {
@@ -47,19 +48,19 @@ const OptionsBarComponent = ({cardView, setCardView, setOrderBySelected, setShow
        <Badge  
        textStyle={tw.style("text-xs")}
        containerStyle={tw.style("mr-1")}
-       badgeStyle={tw.style("rounded-full p-3")}
+       badgeStyle={tw.style("rounded-full py-3 px-1")}
        value={`Complete`}
        status="primary"
        onPress={() => {
          //setOrderBySelected({});
        }}></Badge>
-       
+       </View> */}
         <View style={tw.style("flex-1 flex-row items-center justify-end")}>
           {orderBySelected["key"] && (
             <Badge
               textStyle={tw.style("text-xs")}
               containerStyle={tw.style("mr-1")}
-              badgeStyle={tw.style("rounded-full p-3")}
+              badgeStyle={tw.style("rounded-full py-3 px-1")}
               value={`x  ${orderBySelected["value"]}`}
               status="primary"
               onPress={() => {
