@@ -25,7 +25,7 @@ var schema = (0, schema_1.makeExecutableSchema)({
     resolvers: __spreadArray([graphql_scalars_1.resolvers], resolvers_1.Resolvers, true)
     //Date : GraphQLDate,
 });
-var server = new apollo_server_1.ApolloServer({ schema: schema });
+var server = new apollo_server_1.ApolloServer({ cors: { origin: 'https://studio.apollographql.com', methods: 'POST' }, schema: schema });
 server.listen({ port: process.env.PORT || 4444 }).then(function (_a) {
     var url = _a.url;
     return console.log("server is ready at " + url);
